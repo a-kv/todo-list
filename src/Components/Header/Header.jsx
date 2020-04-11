@@ -1,7 +1,7 @@
 import React from 'react';
 
-class Header extends React.Component {
-    render = () => {
+class TodoListHeader extends React.Component {
+    render = (props) => {
         return (
             <div className="todoList-header">
                 <h3 className="todoList-header__title">What to Learn</h3>
@@ -13,4 +13,4 @@ class Header extends React.Component {
         );
     }
 }
-    export default Header;
+    export default TodoListHeader;

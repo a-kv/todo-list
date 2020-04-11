@@ -1,17 +1,23 @@
 import React from 'react';
 
-class Footer extends React.Component {
-    render = () => {
+class TodoListFooter extends React.Component {
+
+
+    render = (props) => {
+        let classForAll = this.props.filterValue === "All" ? "filter-active" : "";
+        let classForCompleted = this.props.filterValue === "Completed" ? "filter-active" : "";
+        let classForActive = this.props.filterValue === "Active" ? "filter-active" : "";
+
         return (
 
             <div className="todoList-footer">
-                <button>All</button>
-                <button>Completed</button>
-                <button>Active</button>
+                <button className={classForAll}>All</button>
+                <button className={classForCompleted}>Completed</button>
+                <button className={classForActive}>Active</button>
             </div>
         );
     }
 }
 
 
-    export default Footer;
+    export default TodoListFooter;
