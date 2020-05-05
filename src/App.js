@@ -10,14 +10,14 @@ class App extends React.Component {
         super(props);
     }
 
-    nextTaskId = 4;
+    nextTaskId = 0;
 
     state = {
         tasks: [
-            {id: 0, title: "JS", isDone: true, priority: "low"},
-            {id: 1, title: "CSS", isDone: true, priority: "low"},
-            {id: 2, title: "jQuery", isDone: false, priority: "high"},
-            {id: 3, title: "ReactJs", isDone: false, priority: "med"}
+            // {id: 0, title: "JS", isDone: true, priority: "low"},
+            // {id: 1, title: "CSS", isDone: true, priority: "low"},
+            // {id: 2, title: "jQuery", isDone: false, priority: "high"},
+            // {id: 3, title: "ReactJs", isDone: false, priority: "med"}
 
         ],
         filterValue: "All"
@@ -25,8 +25,30 @@ class App extends React.Component {
 
     saveState = () => {
         let stateAsString = JSON.stringify(this.state)
-        localStorage.setItem('counter', stateAsString)
+        localStorage.setItem('state', stateAsString)
     }
+    restoreStore = () => {
+        let state = {
+            tasks: [],
+            filterValue: "All"
+        };
+        let stateAsString = localStorage.getItem('state');
+        if(stateAsString){
+            state = JSON.parse(stateAsString);
+        }
+
+        this.setState(state, () => {
+            this.state.tasks.forEach(t => {
+                if(t.id >= this.nextTaskId){
+                    this.nextTaskId = t.id + 1
+                }
+            })
+        });
+    }
+    componentDidMount() {
+        this.restoreStore(); // удобно запускать сет таймауты и тд
+    }
+
     changeTask = (taskId, obj) => {
         let newTasks = this.state.tasks.map(t => {
             if (t.id === taskId) {
@@ -36,45 +58,27 @@ class App extends React.Component {
 
         });
         this.setState({
-            tasks: newTasks})
-
+            tasks: newTasks}, this.saveState)
     }
+
     changeStatus = (taskId, isDone) => {
         this.changeTask(taskId, {isDone: isDone})
-        // let newTasks = this.state.tasks.map(t => {
-        //     if (t.id !== taskId) {
-        //         return t;
-        //     }
-        //     return {...t, isDone: isDone};
-        //
-        // });
-        // this.setState({
-        //     tasks: newTasks
-        // })
     }
 
     changeTitle = (taskId, title) => {
         this.changeTask(taskId, {title: title})
 
-        // let newTasks = this.state.tasks.map(t => {
-        //     if (t.id !== taskId) {
-        //         return t;
-        //     }
-        //      return {...t, title: title};
-        //
-        // });
-        // this.setState({
-        //     tasks: newTasks
-        // })
     }
 
     addTask = (newTitle) => {
         let newTask = {
-            id: this.nextTaskId, title: newTitle, isDone: false, priority: "low"
+            id: this.nextTaskId,
+            title: newTitle,
+            isDone: false, priority: "low"
         };
         this.nextTaskId++;
         let newTasks = [...this.state.tasks, newTask];
-        this.setState({tasks: newTasks});
+        this.setState({tasks: newTasks},this.saveState);
     };
 
     changeFilter = (newFilterValue) => {

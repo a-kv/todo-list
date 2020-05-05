@@ -15,7 +15,7 @@ class TodoListTask extends React.Component {
         this.props.changeStatus(this.props.task.id, e.currentTarget.checked);
     };
     onTitleChanged = (e) => {
-        this.props.changeTitle(this.props.task.id, e.currentTarget.title)
+        this.props.changeTitle(this.props.task.id, e.currentTarget.value)
     }
 
     render = () => {
