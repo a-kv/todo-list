@@ -8,42 +8,71 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
-        // this.newTaskTitleRef = React.createRef();
-
     }
+
+    nextTaskId = 4;
 
     state = {
         tasks: [
-            {title: "JS", isDone: true, priority: "low"},
-            {title: "CSS", isDone: true, priority: "low"},
-            {title: "jQuery", isDone: false, priority: "high"},
-            {title: "ReactJs", isDone: false, priority: "med"},
-            // {title: "ReactJs", isDone: true},
-            // {title: "JS", isDone: false},
-            // {title: "CSS", isDone: false},
-            // {title: "jQuery", isDone: false},
+            {id: 0, title: "JS", isDone: true, priority: "low"},
+            {id: 1, title: "CSS", isDone: true, priority: "low"},
+            {id: 2, title: "jQuery", isDone: false, priority: "high"},
+            {id: 3, title: "ReactJs", isDone: false, priority: "med"}
+
         ],
         filterValue: "All"
     };
-    changeStatus = (task, isDone) => {
+
+    saveState = () => {
+        let stateAsString = JSON.stringify(this.state)
+        localStorage.setItem('counter', stateAsString)
+    }
+    changeTask = (taskId, obj) => {
         let newTasks = this.state.tasks.map(t => {
-            if (t != task) {
-                return t;
+            if (t.id === taskId) {
+                return {...t, ...obj};
             }
-                 return {...t, isDone: isDone};
+            return t;
 
         });
         this.setState({
-            tasks: newTasks
-        })
+            tasks: newTasks})
+
+    }
+    changeStatus = (taskId, isDone) => {
+        this.changeTask(taskId, {isDone: isDone})
+        // let newTasks = this.state.tasks.map(t => {
+        //     if (t.id !== taskId) {
+        //         return t;
+        //     }
+        //     return {...t, isDone: isDone};
+        //
+        // });
+        // this.setState({
+        //     tasks: newTasks
+        // })
+    }
+
+    changeTitle = (taskId, title) => {
+        this.changeTask(taskId, {title: title})
+
+        // let newTasks = this.state.tasks.map(t => {
+        //     if (t.id !== taskId) {
+        //         return t;
+        //     }
+        //      return {...t, title: title};
+        //
+        // });
+        // this.setState({
+        //     tasks: newTasks
+        // })
     }
 
     addTask = (newTitle) => {
-        // let newTitle = this.newTaskTitleRef.current.value
-        // this.newTaskTitleRef.current.value = ''
         let newTask = {
-            title: newTitle, isDone: false, priority: "low"
+            id: this.nextTaskId, title: newTitle, isDone: false, priority: "low"
         };
+        this.nextTaskId++;
         let newTasks = [...this.state.tasks, newTask];
         this.setState({tasks: newTasks});
     };
@@ -71,11 +100,8 @@ class App extends React.Component {
             <div className="App">
                 <div className="todoList">
                     <TodoListHeader constr={this.newTaskTitleRef} addTask={this.addTask}/>
-                    {/*<h3 className="todoList-header__title">What to Learn</h3>*/}
-                    {/*<div className="todoList-newTaskForm">*/}
-                    {/*<input ref={this.newTaskTitleRef} type="text" placeholder="New task name"/>*/}
-                    {/*<button onClick={this.onAddTaskClick}>Add</button>*/}
-                    <TodoListTasks changeStatus={this.changeStatus} tasks={filteredTasks}/>
+                    <TodoListTasks changeTitle={this.changeTitle} id={this.state.tasks.id}
+                                   changeStatus={this.changeStatus} tasks={filteredTasks}/>
                     <TodoListFooter changeFilter={this.changeFilter} filterValue={this.state.filterValue}/>
                 </div>
             </div>
@@ -87,21 +113,3 @@ class App extends React.Component {
 }
 
 export default App;
-
-// setTimeout(()=> {
-//     let newTask = {
-//         title: "jQuery", isDone: false, priority: "med"
-//     };
-//     let newTasks =[...this.state.tasks, newTask];
-//     this.setState({tasks: newTasks});
-//
-// }, 2000);
-
-// setTimeout(()=> {
-//     let newTask = {
-//         title: "jQuery", isDone: false, priority: "med"
-//     };
-//     let newTasks =[...this.state.tasks, newTask];
-//     this.setState({tasks: newTasks});
-//
-// }, 2000);
