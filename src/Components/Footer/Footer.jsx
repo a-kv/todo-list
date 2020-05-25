@@ -7,9 +7,9 @@ class TodoListFooter extends React.Component {
         isHidden: false
     }
 
-    onAllFilterClick = () => {}
-    onCompletedFilterClick = () => {}
-    onActiveFilterClick = () => {}
+    onAllFilterClick = () => {this.props.changeFilter('All')}
+    onCompletedFilterClick = () => {this.props.changeFilter('Completed')}
+    onActiveFilterClick = () => {this.props.changeFilter('Active')}
     onShowFiltersClick = () => { this.setState({isHidden: false})}
     onHideFiltersClick = () => { this.setState({isHidden: true})}
 
