@@ -4,59 +4,82 @@ import TodoList from "./TodoList";
 import AddNewItemForm from "./Components/Header/AddNewItemForm";
 import {saveState, restoreStore} from "./localStorageTodoList";
 import {connect} from "react-redux";
+import {addTodolistAC, setTodolistsAC} from "./reducer";
+import axios from 'axios';
 
 class App extends React.Component {
 
     state = {
-        todolists: [
-            // {id: 1, title: 'js'},
-            // {id: 2, title: 'redux'},
-            // {id: 3, title: 'TS'},
-            // {id: 4, title: 'react'}
-        ]
+        todolists: []
 
     }
     nextTodoList = 0;
 
     saveStateTodolists = () => {
-        saveState('todolists', this.props)
+        saveState('todoLists', this.props)
     }
-    restoreStoreTodolists = () => {
-        let newState = restoreStore('todolists', this.state)
-        this.setState(newState, () => {
-            this.state.todolists.forEach(t => {
-                if (t.id >= this.nextTodoList) {
-                    this.nextTodoList = t.id + 1
-                }
+
+    restoreState = () => {
+        debugger
+        axios.get('https://social-network.samuraijs.com/api/1.1/todo-lists',
+            {withCredentials: true}) //разрешаются использаваться кросс-доменные запросы и куки
+            .then(res => {
+                debugger
+                this.props.setTodolists(res.data)
             })
-        });
+
+
+        // let newState = restoreStore('todolists', this.state)
+        // this.setState(newState, () => {
+        //     this.state.todolists.forEach(t => {
+        //         if (t.id >= this.nextTodoList) {
+        //             this.nextTodoList = t.id + 1
+        //         }
+        //     })
+        // });
     }
+
     componentDidMount() {
-        this.restoreStoreTodolists();
+        this.restoreState();
     }
-    addTodoList = (newTodoListName) => {
-        let newTodoList = {
-            id: this.nextTodoList,
-            title: newTodoListName,
-            tasks: []
-        }
-        this.nextTodoList++;
-        this.props.createTodolist(newTodoList);
+
+
+    addTodoList = (title) => {
+        debugger
+        axios.post("https://social-network.samuraijs.com/api/1.1/todo-lists", //endpoint
+            {title: title}, //body
+            {
+                withCredentials: true,
+                headers: {"API-KEY": "d13010db-d825-4b89-b5a1-3acdd313b6bb"}
+            })
+            .then(res => {
+                debugger
+                let todolist = res.data.data.item;
+                this.props.addTodolist(todolist);
+            });
     }
+
+    //     let newTodoList = {
+    //         id: this.nextTodoList,
+    //         title: newTodoListName,
+    //         tasks: []
+    //     }
+    //     this.nextTodoList++;
+    //     this.props.createTodolist(newTodoList);
+    // }
     //     this.nextTodoList++;
     //     this.setState({todolists: [...this.state.todolists, newTodoList]},
     //         this.saveStateTodolists);
     // };
 
     render = () => {
-        let todolists = this.props
-            .todolists.map(tl => {
+        const todolists = this.props.todolists.map(tl => {
             return <TodoList key={tl.id} id={tl.id} title={tl.title} tasks={tl.tasks}/>
         });
 
         return (
             <>
-                    <AddNewItemForm addItem={this.addTodoList}/>
+                <AddNewItemForm addItem={this.addTodoList}/>
                 <div className="App">
                     {todolists}
                 </div>
@@ -73,13 +96,12 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = (dispatch) => {
     return {
-        createTodolist: (newTodolist) => {
-            const action = {
-                type: 'ADD_TODOLIST',
-                newTodolist
-            };
-            dispatch(action)
+        setTodolists: (todolists) => {
+            dispatch(setTodolistsAC(todolists));
         },
+        addTodolist: (newTodolist) => {
+            dispatch(addTodolistAC(newTodolist));
+        }
     }
 }
 
