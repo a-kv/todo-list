@@ -6,6 +6,7 @@ import {saveState, restoreStore} from "./localStorageTodoList";
 import {connect} from "react-redux";
 import {addTodolistAC, setTodolistsAC} from "./reducer";
 import axios from 'axios';
+import {api} from "./api/api";
 
 class App extends React.Component {
 
@@ -20,12 +21,8 @@ class App extends React.Component {
     }
 
     restoreState = () => {
-        debugger
-        axios.get('https://social-network.samuraijs.com/api/1.1/todo-lists',
-            {withCredentials: true}) //разрешаются использаваться кросс-доменные запросы и куки
-            .then(res => {
-                debugger
-                this.props.setTodolists(res.data)
+        api.getTodolists().then(res => {
+                this.props.setTodolists(res)
             })
 
 
@@ -45,16 +42,9 @@ class App extends React.Component {
 
 
     addTodoList = (title) => {
-        debugger
-        axios.post("https://social-network.samuraijs.com/api/1.1/todo-lists", //endpoint
-            {title: title}, //body
-            {
-                withCredentials: true,
-                headers: {"API-KEY": "d13010db-d825-4b89-b5a1-3acdd313b6bb"}
-            })
+     api.createTodolist(title)
             .then(res => {
-                debugger
-                let todolist = res.data.data.item;
+                let todolist = res.data.item;
                 this.props.addTodolist(todolist);
             });
     }

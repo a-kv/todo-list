@@ -5,8 +5,9 @@ import TodoListFooter from "./Components/Footer/Footer";
 import TodoListTitle from "./Components/Header/TodoListTitle";
 import AddNewItemForm from "./Components/Header/AddNewItemForm";
 import {connect} from "react-redux";
-import {addTaskAC, deleteTaskAC, deleteTodolistAC, setTasksAC, updateTaskAC} from "./reducer";
+import {addTaskAC, deleteTaskAC, deleteTodolistAC, setTasksAC, updateTaskAC, updateTodolistAC} from "./reducer";
 import axios from "axios";
+import {api} from "./api/api";
 
 
 //"API-KEY": "d13010db-d825-4b89-b5a1-3acdd313b6bb"
@@ -49,19 +50,16 @@ class TodoList extends React.Component {
     }
 
     restoreState = () => { // получаем таски с сервака
-        axios.get(
-            `https://social-network.samuraijs.com/api/1.0/todo-lists/${this.props.id}/tasks`,
-            {withCredentials: true,                                       //
-                headers: {"API-KEY": "d13010db-d825-4b89-b5a1-3acdd313b6bb"}}
-        )
+        api.getTasks(this.props.id)
             .then(res => {
-                if (!res.data.error) {
-                    this.props.setTasks(this.props.id, res.data.items);
-                }});
+                this.props.setTasks(this.props.id, res.items);
+            });
     }
+
     componentDidMount() {
         this.restoreState(); // удобно запускать сет таймауты и тд
     }
+
     // changeTask = (taskId, obj) => {
     //     let newTasks = this.state.tasks.map(t => {
     //         if (t.id === taskId) {
@@ -76,95 +74,91 @@ class TodoList extends React.Component {
     //     }, this.saveState)
     // }
     changeTask = (newTask) => {
-        debugger
-        axios.put(
-            `https://social-network.samuraijs.com/api/1.1/todo-lists/${this.props.id}/tasks/${newTask.id}`,
-            newTask,
-            {
-                withCredentials: true, // передаем с запросом куки для запрашиваемого домена
-                headers: {"API-KEY": "d13010db-d825-4b89-b5a1-3acdd313b6bb"}
-            }
-        )
-            .then(res => {
-                debugger
-                if (res.data.resultCode === 0) {
-                    this.props.updateTask(res.data.data.item);
-                }})
-            .catch(e => { console.log(e)});
+        // this.props.tasks.forEach(t => {
+        //     if (t.id === taskId) {
+                api.updateTask(newTask, this.props.id)
+                    .then(res => {
+                        if (res.resultCode === 0) {
+                            this.props.updateTask(res.data.item);
+                        }
+                    })
+                    .catch(e => {
+                        console.log(e)
+                    });
+            // }
+        // })
+
     }
 
     changeStatus = (newTask, status) => {
-        debugger
-        this.changeTask( { ...newTask, status: status === true ? 2 : 0})
+        this.changeTask({...newTask, status: status === true ? 2 : 0})
     }
 
     changeTitle = (newTask, title) => {
-        debugger
-        this.changeTask( {...newTask, title: title})
+        this.changeTask({...newTask, title: title})
 
     }
     changePriority = (newTask, priority) => {
-        debugger
-        this.changeTask({...newTask, priority: priority})
+
+        this.changeTask({...newTask, priority: priority === 'high' ? 2 : priority === 'med' ? 1 : 0})
 
     }
     deleteTodoList = () => {
-        axios.delete(`https://social-network.samuraijs.com/api/1.1/todo-lists/${this.props.id}`,
-            {
-                withCredentials: true,
-                headers: {"API-KEY": "d13010db-d825-4b89-b5a1-3acdd313b6bb"}
-            })
+        api.deleteTodoList(this.props.id)
             .then(res => {
-                if (res.data.resultCode === 0) {
+                if (res.resultCode === 0) {
                     this.props.deleteTodolist(this.props.id);
                 }
             });
     }
 
-    deleteTask = (taskId) => {
-        axios.delete(
-            `https://social-network.samuraijs.com/api/1.0/todo-lists/tasks/${taskId}`,
-            {
-                withCredentials: true,
-                headers: {"API-KEY": "d13010db-d825-4b89-b5a1-3acdd313b6bb"}
-            }
-        )
+    deleteTask = (taskId, todolistId) => {
+        api.deleteTask(taskId, this.props.id)
             .then(res => {
-                if (res.data.resultCode === 0) {
+                if (res.resultCode === 0) {
                     this.props.deleteTask(taskId, this.props.id);
                 }
             });
     }
+
     addTask = (newText) => {
-        axios.post(`https://social-network.samuraijs.com/api/1.0/todo-lists/${this.props.id}/tasks`, // endpoint
-            {title: newText},  // объект, который нужен серваку для совершения действия
-            {
-                withCredentials: true,
-                headers: {"API-KEY": "d13010db-d825-4b89-b5a1-3acdd313b6bb"}
-            }
-        )
+        api.createTask(newText, this.props.id)
             .then(res => {
-                debugger
-                if (res.data.resultCode === 0) {
-                    debugger
-                    this.props.addTask(res.data.data.item, this.props.id);
-                }});
-    }
-    // let newTask = {
-    //     id: this.nextTaskId,
-    //     title: newTitle,
-    //     isDone: false,
-    //     priority: 'low'
-    // };
-    // this.nextTaskId++;
-    // // let newTasks = [...this.state.tasks, newTask];
-    // this.props.addTask(newTask, this.props.id);
-    // this.setState({tasks: newTasks}, this.saveState);
+                if (res.resultCode === 0) {
+                    let newTask = res.data.item;
+                    this.props.addTask(newTask, this.props.id);
+                }
+            })
+    };
+
+// let newTask = {
+//     id: this.nextTaskId,
+//     title: newTitle,
+//     isDone: false,
+//     priority: 'low'
+// };
+// this.nextTaskId++;
+// // let newTasks = [...this.state.tasks, newTask];
+// this.props.addTask(newTask, this.props.id);
+// this.setState({tasks: newTasks}, this.saveState);
 
     changeFilter = (newFilterValue) => {
         this.setState({
             filterValue: newFilterValue
         });
+    }
+    changeTitleTodolist = (title) => {
+        api.updataTodolist(title, this.props.id)
+            .then(res => {
+                if (res.resultCode === 0) {
+                    this.props.updateTodolist({id: this.props.id, title: title})
+                }
+            })
+        // let newTodolist = {
+        //     id: this.props.id,
+        //     title: title,
+        // }
+
     }
 
     render = () => {
@@ -183,7 +177,8 @@ class TodoList extends React.Component {
         return (
 
             <div className="todoList">
-                <TodoListTitle id={this.props.id} deleteTodoList={this.deleteTodoList}
+                <TodoListTitle changeTitleTodolist={this.changeTitleTodolist} id={this.props.id}
+                               deleteTodoList={this.deleteTodoList}
                                title={this.props.title}/>
                 <AddNewItemForm addItem={this.addTask}/>
                 <TodoListTasks changeTitle={this.changeTitle}
@@ -204,8 +199,8 @@ const mapDispatchToProps = (dispatch) => {
         addTask(newTask, todolistId) {
             dispatch(addTaskAC(newTask, todolistId));
         },
-        setTasks(todolistId,tasks) {
-            dispatch(setTasksAC(todolistId,tasks));
+        setTasks(todolistId, tasks) {
+            dispatch(setTasksAC(todolistId, tasks));
         },
         deleteTodolist: (todolistId) => {
             const action = deleteTodolistAC(todolistId);
@@ -216,7 +211,10 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(action)
         },
         updateTask(task) {
-            dispatch( updateTaskAC(task));
+            dispatch(updateTaskAC(task));
+        },
+        updateTodolist(todolist) {
+            dispatch(updateTodolistAC(todolist));
         }
     }
 }

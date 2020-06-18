@@ -5,7 +5,7 @@ export const ADD_TASK = "TodoList/Reducer/ADD-TASK";
 export const UPDATE_TASK = "TodoList/Reducer/UPDATE-TASK";
 export const SET_TODOLISTS = "TodoList/Reducer/SET_TODOLISTS";
 export const SET_TASKS = "TodoList/Reducer/SET_TASKS";
-
+export const UPDATE_TITLE_TODOLIST = "TodoList/Reducer/UPDATE_TITLE_TODOLIST";
 const initialState = {
     "todolists": []
 }
@@ -39,7 +39,6 @@ export const reducer = (state = initialState, action) => {
                 todolists: state.todolists.filter(tl => tl.id !== action.todolistId)
             }
         case DELETE_TASK:
-            debugger
             return {
                 ...state,
                 todolists: state.todolists.map(tl => {
@@ -65,7 +64,6 @@ export const reducer = (state = initialState, action) => {
                 })
             }
         case UPDATE_TASK:
-            debugger
             return {
                 ...state,
                 todolists: state.todolists.map(tl => {
@@ -85,6 +83,18 @@ export const reducer = (state = initialState, action) => {
                     }
                 })
             }
+        case UPDATE_TITLE_TODOLIST: //start from bll
+            return {
+                ...state,
+                todolists: state.todolists.map(tl => {
+                    if (tl.id !== action.todolist.id) {
+                        return tl;
+                    } else {
+                        return {...tl, title: action.todolist.title}
+                    }
+                })
+            }
+
     }
     // console.log("reducer: ", action);
     return state;
@@ -109,6 +119,9 @@ export const deleteTodolistAC = (todolistId) => {
 }
 export const deleteTaskAC = (taskId, todolistId) => {
     return { type: DELETE_TASK, taskId, todolistId };
+}
+export const updateTodolistAC = (todolist) => {
+    return { type: UPDATE_TITLE_TODOLIST, todolist };
 }
 
 

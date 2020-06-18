@@ -13,22 +13,22 @@ class TodoListTask extends React.Component {
     deactivatedEditMode = () => {
         this.setState({isEditMode: false});
         this.props.changeTitle(this.props.task, this.state.title)
-
     };
     onIsDoneChanged = (e) => {
         this.props.changeStatus(this.props.task, e.currentTarget.checked);
     };
     onTitleChanged = (e) => {
-        this.setState(({title: e.currentTarget.value}))
+        this.setState({title: e.currentTarget.value})
     }
     onchangePriorityValue = (e) => {
         this.props.changePriorityValue(this.props.task, e.currentTarget.value)
     };
 
     render = () => {
-        debugger
+
         let isStatus = this.props.task.status === 2
         let isDoneClasses = isStatus ? "todoList-task done" : "todoList-task";
+        let priorityTask = this.props.task.priority  === 2 ? 'high' : this.props.task.priority  === 1 ? 'med' : 'low'
         return (
             <div className={isDoneClasses}>
                 <input type="checkbox"
@@ -43,11 +43,11 @@ class TodoListTask extends React.Component {
                     : <span onClick={this.activatedEditMode}>{this.props.task.id}: {this.props.task.title} </span>
                 }
                 <span>- priority:
-                    <select onClick={this.onchangePriorityValue}>
+                    <select onClick={this.onchangePriorityValue}                    >
                     <option>low</option>
                     <option>med</option>
                     <option>high</option>
-                </select>{this.props.task.priority}</span>
+                </select>{priorityTask}</span>
                 <button className={style.deleteTaskButton} onClick={() => this.props.deleteTask(this.props.id)}>X
                 </button>
             </div>
