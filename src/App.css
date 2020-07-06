@@ -27,3 +27,6 @@
 .todoList-header__title button{
     background-color: red;
 }
+.deleteTaskButton{
+    background-color: #ff0000;
+}

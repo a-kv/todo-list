@@ -1,9 +1,15 @@
-import React from 'react';
+import * as React from 'react';
 
-class TodoListFooter extends React.Component {
+type OwnPropsType = {
+    changeFilter: (newFilterValue: string) => void
+    filterValue: string
+}
 
-
-    state = {
+type StateType = {
+    isHidden: boolean
+}
+class TodoListFooter extends React.Component<OwnPropsType, StateType> {
+    state: StateType = {
         isHidden: false
     }
 
@@ -14,7 +20,7 @@ class TodoListFooter extends React.Component {
     onHideFiltersClick = () => { this.setState({isHidden: true})}
 
 
-    render = (props) => {
+    render = () => {
 
         let classForAll = this.props.filterValue === "All" ? "filter-active" : "";
         let classForCompleted = this.props.filterValue === "Completed" ? "filter-active" : "";
@@ -24,22 +30,9 @@ class TodoListFooter extends React.Component {
 
             <div className="todoList-footer">
                 {!this.state.isHidden && <div>
-                    <button
-                        className={classForAll}
-                        onClick={this.onAllFilterClick}
-                    >All
-                    </button>
-                    <button
-                        className={classForCompleted}
-                        onClick={this.onCompletedFilterClick}
-                    >Completed
-                    </button>
-                    <button
-                        className={classForActive}
-                        onClick={this.onActiveFilterClick}
-                    >Active
-                    </button>
-
+                    <button className={classForAll} onClick={this.onAllFilterClick}>All </button>
+                    <button className={classForCompleted} onClick={this.onCompletedFilterClick}>Completed</button>
+                    <button className={classForActive} onClick={this.onActiveFilterClick}>Active</button>
                 </div>
                 }
                 {!this.state.isHidden && <span onClick={this.onHideFiltersClick}>hide</span>}

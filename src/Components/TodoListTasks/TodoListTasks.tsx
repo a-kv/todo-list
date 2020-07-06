@@ -1,11 +1,19 @@
-import React from 'react';
+import * as React from 'react';
 import TodoListTask from "./TodoListTask/TodoListTask";
+import {TaskType, TodoType} from "../../types/entities";
 
-
-class TodoListTasks extends React.Component {
+type OwnPropsType = {
+    deleteTask: (taskId: string, todolistId: string) => void
+    changeTitle: (newTask: TaskType, title: string) => void
+    changeStatus: (newTask: TaskType, status: boolean) => void
+    tasks: Array<TaskType>
+    changePriorityValue: (newTask: TaskType, priority: string) => void
+    priority?: string
+}
+class TodoListTasks extends React.Component<OwnPropsType> {
 
     render = () => {
-        let myFn = (t) => {
+        let myFn = (t: TaskType) => {
             return <TodoListTask
                 key={t.id}
                 id={t.id}
@@ -15,7 +23,6 @@ class TodoListTasks extends React.Component {
                 deleteTask={this.props.deleteTask}
                 changePriorityValue={this.props.changePriorityValue}
                 priority={this.props.priority}
-
             />
         }
         let tasksElements = this.props.tasks.map(myFn);
